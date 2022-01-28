@@ -1,0 +1,30 @@
+name: 'E2E Test'
+
+on:
+  push:
+    branches: [main]
+
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Cloning project https://github.com/kyugshim/Siple-check.git
+        run: git clone --recurse-submodules -j8     
+      - name: Docker Compose up Siple check
+        working-directory:
+        run: docker-compose up --build -d
+      - name: Run health check Siple check
+        working-directory:
+        run: bash ./wait_for_it.sh
+      - name: Install E2E
+        run: npm install Siple check/frontend/src/e2e
+        working-directory:
+      - name: Run e2e tests
+        run: npm run wdio Siple check/frontend/src/e2e
+        working-directory:
+      - uses: actions/upload-artifact@v1
+        if: failure()
+        with:
+          name: logs
+          path: logs
